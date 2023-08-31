@@ -23,6 +23,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
 
+    private String userEmail;
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -32,7 +33,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
-        final String userEmail;
+
 
         if(authHeader == null || authHeader.startsWith("Bearer ")){
             filterChain.doFilter(request, response);
@@ -55,5 +56,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+    public String getCurrentUser(){
+        return userEmail;
     }
 }
