@@ -1,5 +1,6 @@
 package com.hrmcredixcam.config;
 
+import com.hrmcredixcam.authdtos.ERole;
 import com.hrmcredixcam.security.JwtAuthenticationEntryPoint;
 import com.hrmcredixcam.security.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
@@ -57,13 +58,23 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable).authorizeHttpRequests(authorize ->
                         authorize.requestMatchers("/api/**")
                                 .permitAll()
+                                //authentication
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers("/api/auth/signIn").permitAll()
                                 .requestMatchers("/api/auth/register").permitAll()
                                 .requestMatchers("/api/auth/refreshToken").permitAll()
                                 .requestMatchers("/api/auth/add/admin/**").permitAll()
+
+                                //employee
+                                .requestMatchers("/api/employee/**").permitAll()
+                                .requestMatchers("/api/employee/manage/**").permitAll()
+
+
+                                //role
                                 .requestMatchers("/api/roles/**").permitAll()
                                 .requestMatchers("/api/roles/addRole/**").permitAll()
+
+                                //swagger
                                 .requestMatchers("/swagger-ui/**").permitAll()
                                 .requestMatchers("/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()

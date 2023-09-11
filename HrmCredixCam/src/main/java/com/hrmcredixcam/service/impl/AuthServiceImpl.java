@@ -1,15 +1,13 @@
 package com.hrmcredixcam.service.impl;
 
 
-import com.hrmcredixcam.authdtos.LoginRequestDTO;
-import com.hrmcredixcam.authdtos.RefreshTokenDTO;
-import com.hrmcredixcam.authdtos.SignupRequestDTO;
-import com.hrmcredixcam.authdtos.UserInfoResponseDTO;
+import com.hrmcredixcam.authdtos.*;
 import com.hrmcredixcam.exception.BlogAPIException;
 import com.hrmcredixcam.exception.TokenRefreshException;
 import com.hrmcredixcam.model.Employee;
 import com.hrmcredixcam.model.RefreshToken;
 import com.hrmcredixcam.repository.EmployeeRepository;
+import com.hrmcredixcam.repository.RoleRepository;
 import com.hrmcredixcam.security.JwtTokenProvider;
 import com.hrmcredixcam.service.AuthService;
 import com.hrmcredixcam.service.RefreshTokenService;
@@ -25,6 +23,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -36,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final EmployeeRepository employeeRepository;
     private final RoleService roleService;
+    private final RoleRepository roleRepository;
     private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -43,11 +43,12 @@ public class AuthServiceImpl implements AuthService {
 
     public AuthServiceImpl(AuthenticationManager authenticationManager,
                            EmployeeRepository employeeRepository,
-                           RoleService roleService, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder,
+                           RoleService roleService, RoleRepository roleRepository, RefreshTokenService refreshTokenService, PasswordEncoder passwordEncoder,
                            JwtTokenProvider jwtTokenProvider) {
         this.authenticationManager = authenticationManager;
         this.employeeRepository = employeeRepository;
         this.roleService = roleService;
+        this.roleRepository = roleRepository;
         this.refreshTokenService = refreshTokenService;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
@@ -118,7 +119,7 @@ public class AuthServiceImpl implements AuthService {
             }
 
             // Create new user's account
-            Employee user = Employee.builder()
+            Employee employee = Employee.builder()
                     .userName(registerDto.getUserName())
                     .email(registerDto.getEmail())
                     .telephone(registerDto.getTelephone())
@@ -133,15 +134,58 @@ public class AuthServiceImpl implements AuthService {
 
             Set<String> strRoles = registerDto.getRole();
             var roles=roleService.getListOfRoleFromListOfRoleStr(strRoles);
-            user.setRoles(roles);
+            employee.setRoles(roles);
 
-            employeeRepository.save(user);
+            employeeRepository.save(employee);
 
             return "Employee registered successfully!.";
         } catch (BlogAPIException e) {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+    @Override
+    public String registerByUser(SignupUserRequestDTO registerDto) {
+        try {
+            // add check for username exists in database
+            if (employeeRepository.existsByUserName(registerDto.getUserName())) {
+                throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Username is already exists!.");
+            }
+
+            // add check for email exists in database
+            if (employeeRepository.existsByEmail(registerDto.getEmail())) {
+                throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Email is already exists!.");
+            }
+
+            // add check for telephone exists in database
+            if (employeeRepository.existsByTelephone(registerDto.getTelephone())) {
+                throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Telephone is already exists!.");
+            }
+
+            // Create new user's account with the USER role
+            Employee employee = Employee.builder()
+                    .userName(registerDto.getUserName())
+                    .email(registerDto.getEmail())
+                    .telephone(registerDto.getTelephone())
+                    .department(registerDto.getDepartment())
+                    .firstName(registerDto.getFirstName())
+                    .lastName(registerDto.getLastName())
+                    .creationDate(LocalDateTime.now())
+                    .password(passwordEncoder.encode(registerDto.getPassword()))
+                    .post(registerDto.getPost())
+                    .isActive(true)
+                    .roles(Collections.singleton(roleRepository.findByRole(ERole.ROLE_USER.toString())
+                            .orElseThrow(() -> new RuntimeException("Error: User Role is not found."))))
+                    .build();
+
+            employeeRepository.save(employee);
+
+            return "Employee registered successfully!.";
+        } catch (BlogAPIException e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
 
     @Override
     public UserInfoResponseDTO refreshToken(RefreshTokenDTO refreshTokendto){

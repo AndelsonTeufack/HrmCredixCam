@@ -1,9 +1,6 @@
 package com.hrmcredixcam.service;
 
-import com.hrmcredixcam.authdtos.LoginRequestDTO;
-import com.hrmcredixcam.authdtos.RefreshTokenDTO;
-import com.hrmcredixcam.authdtos.SignupRequestDTO;
-import com.hrmcredixcam.authdtos.UserInfoResponseDTO;
+import com.hrmcredixcam.authdtos.*;
 
 public interface AuthService {
 
@@ -13,6 +10,8 @@ public interface AuthService {
     String registerByAdmin(SignupRequestDTO registerDto);
 
     //String registerByUser(SignupRequestDTO registerDto);
+
+    String registerByUser(SignupUserRequestDTO registerDto);
 
     UserInfoResponseDTO refreshToken(RefreshTokenDTO refreshTokendto);
 }

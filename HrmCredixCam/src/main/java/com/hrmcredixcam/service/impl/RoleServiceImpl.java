@@ -1,5 +1,6 @@
 package com.hrmcredixcam.service.impl;
 
+import com.hrmcredixcam.repository.EmployeeRepository;
 import com.hrmcredixcam.service.RoleService;
 import com.hrmcredixcam.authdtos.ERole;
 import com.hrmcredixcam.exception.AlreadyExistException;
@@ -16,6 +17,7 @@ import java.util.Set;
 public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Override
     public Set<Role> getListOfRoleFromListOfRoleStr(Set<String> strRoles){
@@ -34,10 +36,10 @@ public class RoleServiceImpl implements RoleService {
                                 .orElseThrow(() -> new RuntimeException("Error: Admin Role is not found."));
                         roles.add(adminRole);
                     }
-                    case "mod" -> {
-                        Role modRole = roleRepository.findByRole(ERole.ROLE_MODERATOR.toString())
+                    case "superadmin" -> {
+                        Role superadminRole = roleRepository.findByRole(ERole.ROLE_SUPERADMIN.toString())
                                 .orElseThrow(() -> new RuntimeException("Error: Moderation Role is not found."));
-                        roles.add(modRole);
+                        roles.add(superadminRole);
                     }
                     default -> {
                         Role userRole = roleRepository.findByRole(ERole.ROLE_USER.toString())

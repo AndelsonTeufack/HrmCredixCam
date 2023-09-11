@@ -1,11 +1,13 @@
 package com.hrmcredixcam.model;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -15,12 +17,13 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity(name = "employees")
+@Document("Employee")
 public class Employee {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Indexed
     private String userName;
 
     private String firstName;
@@ -31,6 +34,7 @@ public class Employee {
 
     private String password;
 
+    @Indexed
     private String email;
 
     private String post;
@@ -39,10 +43,8 @@ public class Employee {
 
     private LocalDateTime creationDate;
 
-    @Column(name = "Activate")
     private boolean isActive=true;
 
-    @OneToMany
     private Set<Role> roles;
 }
 

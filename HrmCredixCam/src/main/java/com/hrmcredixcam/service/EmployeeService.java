@@ -4,6 +4,7 @@ import com.hrmcredixcam.exception.DoesNotExistException;
 import com.hrmcredixcam.exception.InvalidPasswordException;
 import com.hrmcredixcam.exception.ValueAlreadyTakenException;
 import com.hrmcredixcam.model.Employee;
+import com.hrmcredixcam.publicdtos.UpdateEmployeeDTO;
 
 import java.util.List;
 
@@ -26,8 +27,7 @@ public interface EmployeeService {
 
     Employee getEmployeeByEmail(String email);
 
-
-    Employee updateEmployee(String id, Employee employee);
+    void updateEmployee(String id, UpdateEmployeeDTO updatedEmployee);
 
     void deleteEmployee(String id);
 
@@ -36,7 +36,7 @@ public interface EmployeeService {
 
     Employee activateEmployee(String id);
 
-    void updatePassword(String employeeId, String oldPassword, String newPassword) throws InvalidPasswordException;
+    void updatePassword(String employeeId, String newPassword);
 
-    void updateRole(String employeeId, String newRole);
+    void changeRole(String employeeId, String newRole);
 }

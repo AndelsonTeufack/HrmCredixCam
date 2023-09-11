@@ -15,16 +15,6 @@ public class EmployeeUtils {
     }
 
 
-    public static Boolean employeeIsNotNull(Employee employee){
-        if(employee.getDepartment() !=null && employee.getFirstName() != null &&
-        employee.getEmail() != null && employee.getTelephone() != null && employee.getLastName() != null &&
-        employee.getPassword() != null && employee.getPost() != null /*&& employee.getRole() != null*/){
-            return true;
-        }
-
-        return false;
-    }
-
     public static ResponseEntity<Response> getResponseEntityG(String responseMessage, HttpStatus httpStatus){
 
         return ResponseEntity.ok(

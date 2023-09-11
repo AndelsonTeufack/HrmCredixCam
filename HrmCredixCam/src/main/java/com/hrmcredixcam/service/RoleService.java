@@ -9,4 +9,6 @@ public interface RoleService {
     Set<Role> getListOfRoleFromListOfRoleStr(Set<String> strRoles);
 
     Role saveRole(Role roleData) throws AlreadyExistException;
+
+
 }

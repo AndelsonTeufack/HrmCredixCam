@@ -3,6 +3,7 @@ package com.hrmcredixcam.controller;
 import com.hrmcredixcam.authdtos.LoginRequestDTO;
 import com.hrmcredixcam.authdtos.RefreshTokenDTO;
 import com.hrmcredixcam.authdtos.SignupRequestDTO;
+import com.hrmcredixcam.authdtos.SignupUserRequestDTO;
 import com.hrmcredixcam.model.Employee;
 import com.hrmcredixcam.publicdtos.ResponseDTO;
 import com.hrmcredixcam.service.AuthService;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,20 +50,34 @@ public class AuthController {
         }
     }
 
-    //@PreAuthorize("hasRole('ROLE_SUPERADMIN')")
+    @PreAuthorize("hasRole('ROLE_SUPERADMIN')")
     @PostMapping("registerByAdmin")
-    public ResponseEntity<ResponseDTO> registerUser(@Valid @RequestBody SignupRequestDTO signUpRequestDTO) {
+    public ResponseEntity<ResponseDTO> registerUserByAdmin(@Valid @RequestBody SignupRequestDTO signUpRequestDTO) {
 
         try {
             var employee=authService.registerByAdmin(signUpRequestDTO);
             log.info("Success full creating employee : {}",employee);
             return new ResponseEntity<>(entityResponseUtils.SuccessFullResponse("Employee registered successfully!",employee,0), HttpStatus.OK);
         } catch (Exception e) {
-            log.error("Exception creating usr : {}",e.getMessage());
+            log.error("Exception creating employee : {}",e.getMessage());
             return new ResponseEntity<>(entityResponseUtils.ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
 
         }
+    }
 
+
+    @PostMapping("registerByUser")
+    public ResponseEntity<ResponseDTO> registerUserByUSer(@Valid @RequestBody SignupUserRequestDTO signUpRequestDTO) {
+
+        try {
+            var employee=authService.registerByUser(signUpRequestDTO);
+            log.info("Success full creating employee : {}",employee);
+            return new ResponseEntity<>(entityResponseUtils.SuccessFullResponse("Employee registered successfully!",employee,0), HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("Exception creating employee : {}",e.getMessage());
+            return new ResponseEntity<>(entityResponseUtils.ErrorResponse(e.getMessage()), HttpStatus.BAD_REQUEST);
+
+        }
     }
 
     @PostMapping("refreshToken")
